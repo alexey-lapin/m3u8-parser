@@ -1,11 +1,10 @@
 # m3u8-parser
-[![Build Status](https://travis-ci.org/carlanton/m3u8-parser.svg?branch=master)](https://travis-ci.org/carlanton/m3u8-parser) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lindstrom/m3u8-parser/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lindstrom/m3u8-parser)
-[![Javadocs](https://www.javadoc.io/badge/io.lindstrom/m3u8-parser.svg)](https://www.javadoc.io/doc/io.lindstrom/m3u8-parser)
 
+💡 This is a fork of [carlanton/m3u8-parser](https://github.com/carlanton/m3u8-parser)
 
 A simple HLS playlist parser for Java.
 
-The goal of this project was to implement parsers and a consistent Java object model
+The goal of the original project was to implement parsers and a consistent Java object model
 according to [RFC 8216 HTTP Live Streaming](https://tools.ietf.org/html/rfc8216).
 
 This parser is very similar to iHeartRadio's [open-m3u8](https://github.com/iheartradio/open-m3u8). The main differences are:
