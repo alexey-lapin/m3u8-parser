@@ -65,7 +65,7 @@ public class MasterPlaylistReadAndWrite {
 
     private static List<String> variantUris(String playlist) {
         List<String> uris = new ArrayList<>();
-        String[] lines = playlist.split("\n");
+        String[] lines = playlist.split("\\r?\\n|\\r");
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
             if (line.startsWith("#EXT-X-STREAM-INF:")) {
