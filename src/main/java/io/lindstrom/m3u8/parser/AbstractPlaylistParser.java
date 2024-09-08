@@ -59,7 +59,7 @@ public abstract class AbstractPlaylistParser<T extends Playlist, B> {
     }
 
     public T readPlaylist(String string) throws PlaylistParserException {
-        return readPlaylist(Arrays.asList(string.split("\n")).iterator());
+        return readPlaylist(new BufferedReader(new StringReader(string)));
     }
 
     public T readPlaylist(Iterator<String> lineIterator) throws PlaylistParserException {
