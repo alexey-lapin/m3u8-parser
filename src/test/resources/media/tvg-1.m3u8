@@ -1,0 +1,4 @@
+#EXTM3U
+#EXT-X-TARGETDURATION:4
+#EXTINF:3.2 tvg-id="id-1" tvg-logo="logo-1",channel
+v3-1.mp4

@@ -48,6 +48,8 @@ public interface MediaSegment {
 
     List<PartialSegment> partialSegments();
 
+    List<TVGAttribute> tvgAttributes();
+
     static Builder builder() {
         return new Builder();
     }

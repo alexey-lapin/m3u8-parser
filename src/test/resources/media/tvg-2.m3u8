@@ -1,0 +1,12 @@
+#EXTM3U
+#EXT-X-TARGETDURATION:4
+#EXTINF:0 tvg-id="id-1" tvg-logo="logo-1",channel-1
+channel-1.mp4
+#EXTINF:1   tvg-ID= "id-2" TVG-logo ="logo-2",channel-2
+channel-2.mp4
+#EXTINF:-1    TVG-ID = "id-3" tvg-logo="logo-3",channel-3
+channel-3.mp4
+#EXTINF:1.1 tvg-id  =  "id-4"   tvg-logo = "logo-4" ,channel-4
+channel-4.mp4
+#EXTINF:-1.1 TVG-ID="id-5" TVG-LOGO="logo-5",channel-5
+channel-5.mp4

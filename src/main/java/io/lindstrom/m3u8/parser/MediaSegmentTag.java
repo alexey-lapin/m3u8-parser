@@ -1,13 +1,22 @@
 package io.lindstrom.m3u8.parser;
 
 import io.lindstrom.m3u8.model.MediaSegment;
+import io.lindstrom.m3u8.model.TVGAttribute;
+import io.lindstrom.m3u8.model.TVGAttributeKey;
+import io.lindstrom.m3u8.model.TVGAttributeKeys;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 enum MediaSegmentTag implements Tag<MediaSegment, MediaSegment.Builder> {
     EXT_X_DISCONTINUITY {
@@ -70,9 +79,9 @@ enum MediaSegmentTag implements Tag<MediaSegment, MediaSegment.Builder> {
                 int p = attributes.indexOf('"');
                 final String durStr = (p < 0)
                         ? (attributes.startsWith("DURATION=")
-                            ? attributes.substring(9)
-                            : attributes)
-                        : attributes.substring(p+1,attributes.indexOf('"', p+1));
+                        ? attributes.substring(9)
+                        : attributes)
+                        : attributes.substring(p + 1, attributes.indexOf('"', p + 1));
                 builder.cueOut(Double.parseDouble(durStr));
             } catch (IndexOutOfBoundsException | NumberFormatException e) {
                 if (parsingMode == ParsingMode.STRICT)
@@ -128,26 +137,59 @@ enum MediaSegmentTag implements Tag<MediaSegment, MediaSegment.Builder> {
     },
 
     EXTINF {
-        @Override
-        public void read(MediaSegment.Builder builder, String attributes, ParsingMode parsingMode) {
-            int p = attributes.indexOf(',');
 
-            if (p < 0) {
-                builder.duration(Double.parseDouble(attributes));
-            } else {
-                builder.duration(Double.parseDouble(attributes.substring(0, p)));
-                String title = attributes.substring(p + 1);
-                if (!title.isEmpty()) {
+        private final Pattern EXTINF_PATTERN = Pattern.compile("([-]?\\d+(?:\\.\\d+)?)([^,]*)?(?:,(.*))?");
+        private final Pattern ATTRIBUTE_PATTERN = Pattern.compile("(\\S+?)\\s*=\\s*\"([^\"]*)\"");
+
+        @Override
+        public void read(MediaSegment.Builder builder, String attributes, ParsingMode parsingMode) throws PlaylistParserException {
+            Matcher matcher = EXTINF_PATTERN.matcher(attributes);
+            if (matcher.find()) {
+                String duration = matcher.group(1);
+                builder.duration(Double.parseDouble(duration));
+
+                String tvgAttributesTokens = matcher.group(2) == null ? "" : matcher.group(2).trim();
+
+                List<TVGAttribute> tvgAttributes = parseTvgAttributes(tvgAttributesTokens, parsingMode);
+                builder.tvgAttributes(tvgAttributes);
+
+                String title = matcher.group(3) == null ? null : matcher.group(3).trim();
+                if (title != null && !title.isEmpty()) {
                     builder.title(title);
                 }
             }
+        }
+
+        private List<TVGAttribute> parseTvgAttributes(String attributesString, ParsingMode parsingMode) throws PlaylistParserException {
+            Map<TVGAttributeKey, TVGAttribute> tvgAttributes = new HashMap<>();
+
+            Matcher matcher = ATTRIBUTE_PATTERN.matcher(attributesString);
+
+            while (matcher.find()) {
+                String key = matcher.group(1).trim();
+                String value = matcher.group(2).trim();
+                TVGAttributeKey tvgAttributeKey = TVGAttributeKeys.forName(key.toLowerCase());
+                if (tvgAttributeKey == null) {
+                    if (parsingMode.failOnUnknownAttributes()) {
+                        throw new PlaylistParserException("unknown tvg attribute: " + key);
+                    }
+                } else {
+                    tvgAttributes.put(tvgAttributeKey, TVGAttribute.of(tvgAttributeKey, value));
+                }
+            }
+
+            return new ArrayList<>(tvgAttributes.values());
         }
 
         @Override
         public void write(MediaSegment mediaSegment, TextBuilder textBuilder) {
             double d = mediaSegment.duration();
             String duration = durationToString(d);
-            textBuilder.add('#').add(tag()).add(":").add(duration).add(",");
+            textBuilder.add('#').add(tag()).add(":").add(duration);
+            String tvgAttributes = mediaSegment.tvgAttributes().stream()
+                    .map(i -> i.key().getName() + "=\"" + i.value() + "\"")
+                    .collect(Collectors.joining(" "));
+            textBuilder.add(" ").add(tvgAttributes).add(",");
             mediaSegment.title().ifPresent(textBuilder::add);
             textBuilder.add('\n');
         }
@@ -177,7 +219,7 @@ enum MediaSegmentTag implements Tag<MediaSegment, MediaSegment.Builder> {
         }
     },
 
-    EXT_X_PART{
+    EXT_X_PART {
         @Override
         public void read(MediaSegment.Builder builder, String attributes, ParsingMode parsingMode) throws PlaylistParserException {
             builder.addPartialSegments(PartialSegmentAttribute.parse(attributes, parsingMode));
@@ -192,7 +234,7 @@ enum MediaSegmentTag implements Tag<MediaSegment, MediaSegment.Builder> {
     private static String durationToString(double d) {
         final String duration;
         if (d >= 0.001 && d < 10000000) {
-           duration = Double.toString(d);
+            duration = Double.toString(d);
         } else {
             // When d > 10^3 or d <= 10^7, Double.toString will use "computerized scientific notation" which is not
             // supported by the HLS spec. As a workaround we use DecimalFormat. It's not thread-safe so we will
