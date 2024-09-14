@@ -186,10 +186,13 @@ enum MediaSegmentTag implements Tag<MediaSegment, MediaSegment.Builder> {
             double d = mediaSegment.duration();
             String duration = durationToString(d);
             textBuilder.add('#').add(tag()).add(":").add(duration);
-            String tvgAttributes = mediaSegment.tvgAttributes().stream()
-                    .map(i -> i.key().getName() + "=\"" + i.value() + "\"")
-                    .collect(Collectors.joining(" "));
-            textBuilder.add(" ").add(tvgAttributes).add(",");
+            if (!mediaSegment.tvgAttributes().isEmpty()) {
+                String tvgAttributes = mediaSegment.tvgAttributes().stream()
+                        .map(i -> i.key().getName() + "=\"" + i.value() + "\"")
+                        .collect(Collectors.joining(" "));
+                textBuilder.add(" ").add(tvgAttributes);
+            }
+            textBuilder.add(",");
             mediaSegment.title().ifPresent(textBuilder::add);
             textBuilder.add('\n');
         }
