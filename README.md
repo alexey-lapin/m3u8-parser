@@ -1,6 +1,6 @@
 # m3u8-parser
 
-💡 This is a fork of [carlanton/m3u8-parser](https://github.com/carlanton/m3u8-parser)
+💡 This is a fork of [carlanton/m3u8-parser](https://github.com/carlanton/m3u8-parser) with TVG attributes support.
 
 A simple HLS playlist parser for Java.
 
@@ -18,14 +18,14 @@ This parser is very similar to iHeartRadio's [open-m3u8](https://github.com/ihea
 Maven:
 ```xml
 <dependency>
-    <groupId>io.lindstrom</groupId>
+    <groupId>com.github.alexey-lapin.m3u8-parser</groupId>
     <artifactId>m3u8-parser</artifactId>
-    <version>0.28</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 Gradle:
 ```
-implementation 'io.lindstrom:m3u8-parser:0.28'
+implementation("com.github.alexey-lapin.m3u8-parser:m3u8-parser:0.1.0")
 ```
 
 ## Usage
@@ -110,6 +110,43 @@ http://media.example.com/second.ts
 #EXTINF:3.003,
 http://media.example.com/third.ts
 #EXT-X-ENDLIST
+```
+
+### Create media playlist with TVG attributes
+```java
+ MediaPlaylist mediaPlaylist = MediaPlaylist.builder()
+                .targetDuration(2)
+                .addMediaSegments(MediaSegment.builder()
+                        .title("Channel 1")
+                        .duration(1)
+                        .addTvgAttributes(TVGAttribute.of(TVGAttributeKeys.TVG_ID, "id-1"))
+                        .addTvgAttributes(TVGAttribute.of(TVGAttributeKeys.TVG_LOGO, "http://example.com/logo1.jpg"))
+                        .addTvgAttributes(TVGAttribute.of(TVGAttributeKeys.GROUP_TITLE, "Sports"))
+                        .uri("http://example.com/stream1.ts")
+                        .build())
+                .addMediaSegments(MediaSegment.builder()
+                        .title("Channel 2")
+                        .du ration(1.55)
+                        .addTvgAttributes(TVGAttribute.of(TVGAttributeKeys.TVG_ID, "id-2"))
+                        .addTvgAttributes(TVGAttribute.of(TVGAttributeKeys.TVG_LOGO, "http://example.com/logo2.jpg"))
+                        .addTvgAttributes(TVGAttribute.of(TVGAttributeKeys.GROUP_TITLE, "News"))
+                        .uri("http://example.com/stream2.ts")
+                        .build())
+                .build();
+
+MediaPlaylistParser parser = new MediaPlaylistParser();
+System.out.println(parser.writePlaylistAsString(mediaPlaylist));
+```
+
+This code should produce the following media playlist:
+```
+#EXTM3U
+#EXT-X-TARGETDURATION:2
+#EXT-X-MEDIA-SEQUENCE:0
+#EXTINF:1.0 tvg-id="id-1" tvg-logo="http://example.com/logo1.jpg" group-title="Sports",Channel 1
+http://example.com/stream1.ts
+#EXTINF:1.55 tvg-id="id-2" tvg-logo="http://example.com/logo2.jpg" group-title="News",Channel 2
+http://example.com/stream2.ts
 ```
 
 ### Parse master playlist
@@ -202,10 +239,6 @@ EXT-X-PART-INF
 
 EXT-X-CUE-OUT:<duration>
 EXT-X-CUE-IN
-```
-
-The following tags are currently not implemented:
-```
 ```
 
 ## Android
