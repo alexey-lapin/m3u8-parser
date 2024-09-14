@@ -1,5 +1,8 @@
 # m3u8-parser
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.alexey-lapin.m3u8-parser/m3u8-parser?color=%2349C41B)](https://central.sonatype.com/artifact/com.github.alexey-lapin.m3u8-parser/m3u8-parser)
+[![codecov](https://codecov.io/gh/alexey-lapin/m3u8-parser/graph/badge.svg?token=6NAFXGDPC5)](https://codecov.io/gh/alexey-lapin/m3u8-parser)
+
 💡 This is a fork of [carlanton/m3u8-parser](https://github.com/carlanton/m3u8-parser) with TVG attributes support.
 
 A simple HLS playlist parser for Java.
@@ -126,7 +129,7 @@ http://media.example.com/third.ts
                         .build())
                 .addMediaSegments(MediaSegment.builder()
                         .title("Channel 2")
-                        .du ration(1.55)
+                        .duration(1.55)
                         .addTvgAttributes(TVGAttribute.of(TVGAttributeKeys.TVG_ID, "id-2"))
                         .addTvgAttributes(TVGAttribute.of(TVGAttributeKeys.TVG_LOGO, "http://example.com/logo2.jpg"))
                         .addTvgAttributes(TVGAttribute.of(TVGAttributeKeys.GROUP_TITLE, "News"))
