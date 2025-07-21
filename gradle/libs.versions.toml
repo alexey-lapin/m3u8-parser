@@ -1,6 +1,6 @@
 [libraries]
 immutables-value = { module = "org.immutables:value", version = "2.10.1" }
-junit = { module = "junit:junit", version = "4.12" }
+junit = { module = "junit:junit", version = "4.13.2" }
 
 [plugins]
 nexus = {id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0"}
