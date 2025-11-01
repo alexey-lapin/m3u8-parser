@@ -73,7 +73,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Changelog
-        uses: mikepenz/release-changelog-builder-action@v5
+        uses: mikepenz/release-changelog-builder-action@v6
         with:
           outputFile: changelog.txt
           configuration: ".github/release-changelog-builder.json"
